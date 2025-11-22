@@ -221,6 +221,7 @@ const PricingTable = () => (
 
 const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_comparison, insurance_comparison, intl_trade_comparison }) => {
   const [selectedSegment, setSelectedSegment] = useState('all');
+  const [selectedCompany, setSelectedCompany] = useState(null);
 
   // Segment colors
   const segmentColors = {
@@ -230,6 +231,14 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
     'E-Commerce': 'var(--accent-yellow)',
     'Low-Cost Factory': 'var(--accent-red)',
     'Mid-Tier Сеть': '#6b7280'
+  };
+
+  // Priority colors for segment cards
+  const priorityColors = {
+    'Высший': { bg: 'rgba(239, 68, 68, 0.2)', text: '#ef4444' },
+    'Высокий': { bg: 'rgba(245, 158, 11, 0.2)', text: '#f59e0b' },
+    'Средний': { bg: 'rgba(107, 114, 128, 0.2)', text: '#9ca3af' },
+    'Низкий': { bg: 'rgba(107, 114, 128, 0.1)', text: '#6b7280' }
   };
 
   // Filter matrix by segment
@@ -247,7 +256,10 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
       </div>
 
       {/* Segments Overview */}
-      <h3 style={{ marginBottom: '1.5rem' }}>Сегменты Рынка</h3>
+      <h3 style={{ marginBottom: '0.5rem' }}>Сегменты Рынка</h3>
+      <p style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', marginBottom: '1rem' }}>
+        👆 Кликните на сегмент для фильтрации и просмотра детальных профилей с SLA, гарантиями и страховкой
+      </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
         {segments.map((seg, i) => (
           <div
@@ -283,7 +295,7 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
       </div>
 
       {/* Competitor Matrix */}
-      <h3 style={{ marginBottom: '1rem' }}>
+      <h3 style={{ marginBottom: '0.5rem' }}>
         Матрица Конкурентов
         {selectedSegment !== 'all' && (
           <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '0.75rem' }}>
@@ -291,6 +303,9 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
           </span>
         )}
       </h3>
+      <p style={{ fontSize: '0.8rem', color: 'var(--accent-green)', marginBottom: '1rem' }}>
+        👆 Кликните на название компании для просмотра детального профиля
+      </p>
 
       <div className="competitor-table-container" style={{ overflowX: 'auto', marginBottom: '2.5rem' }}>
         <table className="competitor-table" style={{ minWidth: '900px' }}>
@@ -307,9 +322,12 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
           </thead>
           <tbody>
             {filteredMatrix.map((row, i) => (
-              <tr key={i}>
+              <tr key={i} style={{ background: selectedCompany === row.name ? 'rgba(0, 242, 255, 0.05)' : 'transparent' }}>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+                    onClick={() => setSelectedCompany(selectedCompany === row.name ? null : row.name)}
+                  >
                     <div style={{
                       width: '32px',
                       height: '32px',
@@ -326,7 +344,7 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
                       {row.name.charAt(0)}
                     </div>
                     <div>
-                      <strong style={{ display: 'block' }}>{row.name}</strong>
+                      <strong style={{ display: 'block', color: 'var(--accent-cyan)' }}>{row.name}</strong>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{row.year}</span>
                     </div>
                   </div>
@@ -355,6 +373,165 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
           </tbody>
         </table>
       </div>
+
+      {/* Selected Company Detail */}
+      {selectedCompany && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          {matrix.filter(comp => comp.name === selectedCompany).map((comp, i) => (
+            <div key={i} style={{
+              padding: '1.5rem',
+              background: 'var(--bg-card)',
+              border: '2px solid var(--accent-cyan)',
+              borderRadius: '0.75rem',
+              borderLeft: `4px solid ${segmentColors[comp.segment]}`
+            }}>
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '1.2rem', marginBottom: '0.25rem' }}>{comp.name}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    {comp.location} • {comp.year} • {comp.team}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <div style={{
+                    padding: '0.5rem 0.75rem',
+                    background: 'var(--accent-green)',
+                    color: '#000',
+                    borderRadius: '0.5rem',
+                    fontWeight: '700',
+                    fontSize: '0.9rem'
+                  }}>
+                    {comp.price}
+                  </div>
+                  <button
+                    onClick={() => setSelectedCompany(null)}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '0.25rem',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      padding: '0.5rem 0.75rem',
+                      fontSize: '0.8rem'
+                    }}
+                  >
+                    ✕ Закрыть
+                  </button>
+                </div>
+              </div>
+
+              {/* SLA & Insurance Row */}
+              {(comp.sla || comp.insurance) && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
+                  {comp.sla && (
+                    <div style={{
+                      padding: '0.75rem',
+                      background: 'rgba(0, 242, 255, 0.05)',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.8rem'
+                    }}>
+                      <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>SLA</div>
+                      <div style={{ fontWeight: '600', color: comp.sla === '1ч' || comp.sla === '<24ч' || comp.sla === '24ч' ? 'var(--accent-green)' : 'var(--text-primary)', fontSize: '1rem' }}>
+                        {comp.sla}
+                      </div>
+                      {comp.sla_type && <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{comp.sla_type}</div>}
+                    </div>
+                  )}
+                  {comp.guarantee && (
+                    <div style={{
+                      padding: '0.75rem',
+                      background: 'rgba(112, 0, 255, 0.05)',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.8rem'
+                    }}>
+                      <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Гарантия</div>
+                      <div style={{ fontWeight: '600', color: comp.guarantee.includes('Zero Multas') || comp.guarantee.includes('Превентивный') ? 'var(--accent-purple)' : 'var(--text-primary)', fontSize: '1rem' }}>
+                        {comp.guarantee}
+                      </div>
+                    </div>
+                  )}
+                  {comp.insurance && (
+                    <div style={{
+                      padding: '0.75rem',
+                      background: 'rgba(0, 255, 136, 0.05)',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.8rem'
+                    }}>
+                      <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Страховка</div>
+                      <div style={{ fontWeight: '600', color: comp.insurance.includes('€') ? 'var(--accent-green)' : 'var(--text-primary)', fontSize: '1rem' }}>
+                        {comp.insurance}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Positioning */}
+              {comp.positioning && (
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(0, 242, 255, 0.05)',
+                  borderRadius: '0.5rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.85rem',
+                  fontStyle: 'italic',
+                  lineHeight: '1.5'
+                }}>
+                  {comp.positioning}
+                </div>
+              )}
+
+              {/* Services */}
+              {comp.services && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Услуги</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {comp.services.map((service, j) => (
+                      <span key={j} style={{
+                        padding: '0.25rem 0.5rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        color: 'var(--text-secondary)'
+                      }}>
+                        {service}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Strengths & Weaknesses */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem', fontSize: '0.85rem' }}>
+                <div>
+                  <div style={{ color: 'var(--accent-green)', marginBottom: '0.5rem', fontWeight: '600' }}>✓ Сильные стороны</div>
+                  <div style={{ color: 'var(--text-secondary)', lineHeight: '1.5' }}>{comp.strengths}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--accent-red)', marginBottom: '0.5rem', fontWeight: '600' }}>✗ Слабые стороны</div>
+                  <div style={{ color: 'var(--text-secondary)', lineHeight: '1.5' }}>{comp.weaknesses}</div>
+                </div>
+              </div>
+
+              {/* Key Insight */}
+              {comp.key_insight && (
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: 'rgba(112, 0, 255, 0.1)',
+                  borderRadius: '0.5rem',
+                  borderLeft: '3px solid var(--accent-purple)',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.5'
+                }}>
+                  <span style={{ fontWeight: '600', color: 'var(--accent-purple)' }}>💡 Ключевой инсайт: </span>
+                  <span style={{ color: 'var(--text-secondary)' }}>{comp.key_insight}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Expandable Competitor Details */}
       {selectedSegment !== 'all' && filteredMatrix.length > 0 && (

@@ -137,35 +137,42 @@ export const content = {
       heading: "Глубинный Анализ Рынка",
       segments: [
         {
-          name: "Tech-Forward Gestorías",
+          name: "Tech-Forward",
           icon: "🚀",
           description: "Цифровые asesorías для стартапов и tech-компаний. UX как у необанков, прозрачное ценообразование, Holded/облачные ERP.",
           examples: "Fin2gO, Lean Finance, Xolo, Companio",
           priority: "Высший"
         },
         {
-          name: "Специалисты по ВЭД",
+          name: "ВЭД-специалист",
           icon: "🌍",
           description: "Эксперты по импорту/экспорту, Intrastat, DUA, международному НДС. Продают спокойствие в вопросах compliance.",
           examples: "Defez Asesores, Brao & Co, Ilia Group",
           priority: "Высший"
         },
         {
-          name: "ERP Интеграторы (Odoo)",
+          name: "Odoo Integrator",
           icon: "⚙️",
           description: "Объединяют IT-консалтинг с бухгалтерией. Управляют налогами прямо внутри ERP клиента.",
           examples: "ContalDia, GAFIC, Domatix",
           priority: "Высокий"
         },
         {
-          name: "E-Commerce & Amazon FBA",
+          name: "E-Commerce",
           icon: "📦",
           description: "Понимают специфику маркетплейсов: 20+ номеров НДС, PAN-EU логистика, тысячи микротранзакций.",
           examples: "Datali Group, Moraleda Gestión, Epinium",
           priority: "Высокий"
         },
         {
-          name: "Mid-Tier Сети",
+          name: "Low-Cost Factory",
+          icon: "🏭",
+          description: "Масс-маркет гестории с низкими ценами. Конвейерный подход, подходит для autónomos и микро-бизнеса.",
+          examples: "Ayuda T Pymes, Declarando, Gestoría Online",
+          priority: "Низкий"
+        },
+        {
+          name: "Mid-Tier Сеть",
           icon: "🏢",
           description: "Стабильность Big4 без экстремальной стоимости. Международный охват, но бюрократия.",
           examples: "ETL Global, BDO, Grant Thornton, Auren",
