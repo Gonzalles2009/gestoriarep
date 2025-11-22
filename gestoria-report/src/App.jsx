@@ -219,58 +219,602 @@ const PricingTable = () => (
   </div>
 );
 
-const CompetitorTable = ({ matrix, summary }) => {
-  // Calculate metrics
-  const avgPrice = Math.round(matrix.reduce((acc, curr) => {
-    const price = parseInt(curr.price.replace(/[^0-9]/g, '')) || 500;
-    return acc + price;
-  }, 0) / matrix.length);
+const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_comparison, insurance_comparison, intl_trade_comparison }) => {
+  const [selectedSegment, setSelectedSegment] = useState('all');
+
+  // Segment colors
+  const segmentColors = {
+    'Tech-Forward': 'var(--accent-cyan)',
+    'ВЭД-специалист': 'var(--accent-green)',
+    'Odoo Integrator': 'var(--accent-purple)',
+    'E-Commerce': 'var(--accent-yellow)',
+    'Low-Cost Factory': 'var(--accent-red)',
+    'Mid-Tier Сеть': '#6b7280'
+  };
+
+  // Filter matrix by segment
+  const filteredMatrix = selectedSegment === 'all'
+    ? matrix
+    : matrix.filter(c => c.segment === selectedSegment);
 
   return (
     <div>
+      {/* Key Metrics */}
       <div className="metrics-grid" style={{ marginBottom: '2rem' }}>
-        <MetricCard label="Средний Чек Рынка" value={`€${avgPrice}`} subtext="Monthly Fee" />
-        <MetricCard label="Market Gap" value="High" subtext="S.L. €1-10M Segment" />
-        <MetricCard label="Risk Variance" value="Critical" subtext="Factory vs Boutique" />
+        <MetricCard label="Конкурентов в базе" value={matrix.length} subtext="Все сегменты" />
+        <MetricCard label="Market Gap" value="S.L. €1-10M" subtext="Пропущенная середина" />
+        <MetricCard label="Рыночных возможностей" value={gaps.length} subtext="Для входа" />
       </div>
 
-      <div className="competitor-table-container">
-        <table className="competitor-table">
+      {/* Segments Overview */}
+      <h3 style={{ marginBottom: '1.5rem' }}>Сегменты Рынка</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+        {segments.map((seg, i) => (
+          <div
+            key={i}
+            onClick={() => setSelectedSegment(selectedSegment === seg.name ? 'all' : seg.name)}
+            style={{
+              padding: '1.25rem',
+              background: selectedSegment === seg.name ? 'rgba(0, 242, 255, 0.1)' : 'var(--bg-card)',
+              border: selectedSegment === seg.name ? '2px solid var(--accent-primary)' : '1px solid var(--border-color)',
+              borderRadius: '0.75rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{seg.icon}</div>
+            <div style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>{seg.name}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+              {seg.examples}
+            </div>
+            <div style={{
+              marginTop: '0.75rem',
+              fontSize: '0.7rem',
+              padding: '0.25rem 0.5rem',
+              background: seg.priority === 'Высший' ? 'rgba(239, 68, 68, 0.2)' : seg.priority === 'Высокий' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(107, 114, 128, 0.2)',
+              color: seg.priority === 'Высший' ? '#ef4444' : seg.priority === 'Высокий' ? '#f59e0b' : '#9ca3af',
+              borderRadius: '0.25rem',
+              display: 'inline-block'
+            }}>
+              {seg.priority} приоритет
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Competitor Matrix */}
+      <h3 style={{ marginBottom: '1rem' }}>
+        Матрица Конкурентов
+        {selectedSegment !== 'all' && (
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '0.75rem' }}>
+            ({filteredMatrix.length} из {matrix.length})
+          </span>
+        )}
+      </h3>
+
+      <div className="competitor-table-container" style={{ overflowX: 'auto', marginBottom: '2.5rem' }}>
+        <table className="competitor-table" style={{ minWidth: '900px' }}>
           <thead>
             <tr>
-              <th>Игрок</th>
-              <th>Тип</th>
-              <th>Цена</th>
-              <th>Технология</th>
-              <th>Риск</th>
+              <th>Компания</th>
+              <th>Сегмент</th>
+              <th>Локация</th>
+              <th>Команда</th>
+              <th>Цена/мес</th>
+              <th>Технологии</th>
+              <th>Идеальный клиент</th>
             </tr>
           </thead>
           <tbody>
-            {matrix.map((row, i) => (
+            {filteredMatrix.map((row, i) => (
               <tr key={i}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: `${segmentColors[row.segment]}20`,
+                      border: `2px solid ${segmentColors[row.segment]}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      color: segmentColors[row.segment]
+                    }}>
                       {row.name.charAt(0)}
                     </div>
-                    <strong>{row.name}</strong>
+                    <div>
+                      <strong style={{ display: 'block' }}>{row.name}</strong>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{row.year}</span>
+                    </div>
                   </div>
                 </td>
-                <td><span className="tag standard">{row.type}</span></td>
-                <td style={{ fontFamily: 'monospace', fontSize: '1.1em' }}>{row.price}</td>
-                <td>{row.tech}</td>
                 <td>
-                  <span className={`risk-badge ${row.risk.includes('Высокий') ? 'high' : row.risk.includes('Низкий') ? 'low' : 'medium'}`}>
-                    {row.risk.split(' ')[0]}
+                  <span style={{
+                    fontSize: '0.75rem',
+                    padding: '0.25rem 0.5rem',
+                    background: `${segmentColors[row.segment]}20`,
+                    color: segmentColors[row.segment],
+                    borderRadius: '0.25rem',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {row.segment}
                   </span>
                 </td>
+                <td style={{ fontSize: '0.85rem' }}>{row.location}</td>
+                <td style={{ fontSize: '0.85rem', textAlign: 'center' }}>{row.team}</td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.9rem', fontWeight: '600', color: 'var(--accent-green)' }}>
+                  {row.price}
+                </td>
+                <td style={{ fontSize: '0.8rem', maxWidth: '150px' }}>{row.tech}</td>
+                <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', maxWidth: '150px' }}>{row.ideal_for}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <p style={{ marginTop: '1rem', fontStyle: 'italic', color: 'var(--text-secondary)', padding: '1rem', borderLeft: '3px solid var(--accent-purple)', background: 'rgba(112, 0, 255, 0.05)' }}>
-          {summary}
-        </p>
+      </div>
+
+      {/* Expandable Competitor Details */}
+      {selectedSegment !== 'all' && filteredMatrix.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h4 style={{ marginBottom: '1rem' }}>Детальные профили: {selectedSegment}</h4>
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {filteredMatrix.map((comp, i) => (
+              <div key={i} style={{
+                padding: '1.5rem',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.75rem',
+                borderLeft: `4px solid ${segmentColors[comp.segment]}`
+              }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <div>
+                    <div style={{ fontWeight: '700', fontSize: '1.1rem', marginBottom: '0.25rem' }}>{comp.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {comp.location} • {comp.year} • {comp.team}
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: '0.5rem 0.75rem',
+                    background: 'var(--accent-green)',
+                    color: '#000',
+                    borderRadius: '0.5rem',
+                    fontWeight: '700',
+                    fontSize: '0.9rem'
+                  }}>
+                    {comp.price}
+                  </div>
+                </div>
+
+                {/* Positioning */}
+                {comp.positioning && (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(0, 242, 255, 0.05)',
+                    borderRadius: '0.5rem',
+                    marginBottom: '1rem',
+                    fontSize: '0.85rem',
+                    fontStyle: 'italic',
+                    color: 'var(--text-primary)',
+                    lineHeight: '1.5'
+                  }}>
+                    {comp.positioning}
+                  </div>
+                )}
+
+                {/* Services */}
+                {comp.services && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Услуги</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {comp.services.map((service, j) => (
+                        <span key={j} style={{
+                          padding: '0.25rem 0.5rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '0.25rem',
+                          fontSize: '0.75rem',
+                          color: 'var(--text-secondary)'
+                        }}>
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pricing Tiers */}
+                {comp.pricing_tiers && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Тарифы</div>
+                    <div style={{ display: 'grid', gap: '0.5rem' }}>
+                      {comp.pricing_tiers.map((tier, j) => (
+                        <div key={j} style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.5rem',
+                          background: 'rgba(255, 255, 255, 0.02)',
+                          borderRadius: '0.25rem',
+                          fontSize: '0.8rem'
+                        }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>
+                            {tier.name} {tier.desc && <span style={{ opacity: 0.7 }}>— {tier.desc}</span>}
+                          </span>
+                          <span style={{ fontWeight: '600', color: 'var(--accent-green)', fontFamily: 'monospace' }}>{tier.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Strengths & Weaknesses */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem', fontSize: '0.85rem' }}>
+                  <div>
+                    <div style={{ color: 'var(--accent-green)', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.8rem' }}>✓ Сильные стороны</div>
+                    <div style={{ color: 'var(--text-secondary)', lineHeight: '1.5' }}>{comp.strengths}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--accent-red)', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.8rem' }}>✗ Слабые стороны</div>
+                    <div style={{ color: 'var(--text-secondary)', lineHeight: '1.5' }}>{comp.weaknesses}</div>
+                  </div>
+                </div>
+
+                {/* Key Insight */}
+                {comp.key_insight && (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(112, 0, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    borderLeft: '3px solid var(--accent-purple)',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.5'
+                  }}>
+                    <span style={{ fontWeight: '600', color: 'var(--accent-purple)' }}>💡 Ключевой инсайт: </span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{comp.key_insight}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Market Insights */}
+      <h3 style={{ marginBottom: '1rem' }}>Рыночные Инсайты</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+        {insights.map((insight, i) => (
+          <div key={i} style={{
+            padding: '1.25rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.75rem',
+            borderTop: '3px solid var(--accent-cyan)'
+          }}>
+            <div style={{ fontSize: '0.95rem', fontWeight: '600', marginBottom: '0.75rem' }}>{insight.title}</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{insight.text}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Market Gaps */}
+      <h3 style={{ marginBottom: '1rem' }}>Рыночные Возможности (6 Gaps)</h3>
+      <div style={{ display: 'grid', gap: '1.5rem', marginBottom: '2rem' }}>
+        {gaps.map((gap, i) => (
+          <div key={i} style={{
+            padding: '1.5rem',
+            background: 'rgba(0, 255, 136, 0.05)',
+            border: '1px solid rgba(0, 255, 136, 0.3)',
+            borderRadius: '0.75rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-green)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#000',
+                  fontWeight: 'bold',
+                  fontSize: '0.85rem',
+                  flexShrink: 0
+                }}>
+                  {i + 1}
+                </div>
+                <div style={{ fontWeight: '700', fontSize: '1rem' }}>{gap.title}</div>
+              </div>
+              {gap.opportunity && (
+                <div style={{
+                  padding: '0.35rem 0.75rem',
+                  background: 'var(--accent-green)',
+                  color: '#000',
+                  borderRadius: '0.5rem',
+                  fontWeight: '700',
+                  fontSize: '0.8rem',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {gap.opportunity}
+                </div>
+              )}
+            </div>
+
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '1rem' }}>
+              {gap.description}
+            </div>
+
+            {gap.solution && (
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent-cyan)', marginBottom: '0.25rem', letterSpacing: '0.05em' }}>Решение</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{gap.solution}</div>
+              </div>
+            )}
+
+            {gap.market_size && (
+              <div style={{
+                padding: '0.5rem 0.75rem',
+                background: 'rgba(0, 242, 255, 0.1)',
+                borderRadius: '0.25rem',
+                fontSize: '0.8rem',
+                color: 'var(--accent-cyan)',
+                fontFamily: 'monospace'
+              }}>
+                📊 {gap.market_size}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* SLA Comparison */}
+      {sla_comparison && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>{sla_comparison.title}</h3>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: '0.5rem',
+            marginBottom: '1rem',
+            fontSize: '0.85rem',
+            color: 'var(--accent-red)'
+          }}>
+            ⚠️ {sla_comparison.note}
+          </div>
+          <div className="data-table-container" style={{ overflowX: 'auto', marginBottom: '1rem' }}>
+            <table className="data-table" style={{ minWidth: '600px' }}>
+              <thead>
+                <tr>
+                  <th>Провайдер</th>
+                  <th>SLA</th>
+                  <th>Гарантия</th>
+                  <th>Примечания</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sla_comparison.data.map((row, i) => (
+                  <tr key={i}>
+                    <td style={{ fontWeight: '600' }}>{row.name}</td>
+                    <td style={{
+                      fontFamily: 'monospace',
+                      color: row.sla === '1 час' ? 'var(--accent-green)' : row.sla.includes('24') ? 'var(--accent-cyan)' : 'var(--text-secondary)'
+                    }}>
+                      {row.sla}
+                    </td>
+                    <td>
+                      <span style={{
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        background: row.guarantee === 'Письменная' ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        color: row.guarantee === 'Письменная' ? 'var(--accent-green)' : 'var(--text-secondary)'
+                      }}>
+                        {row.guarantee}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{row.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: 'rgba(0, 242, 255, 0.05)',
+            borderLeft: '3px solid var(--accent-cyan)',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem'
+          }}>
+            💡 {sla_comparison.recommendation}
+          </div>
+        </div>
+      )}
+
+      {/* Insurance Comparison */}
+      {insurance_comparison && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>{insurance_comparison.title}</h3>
+
+          {/* Legal Requirements */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{
+              padding: '1rem',
+              background: 'rgba(239, 68, 68, 0.05)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '0.5rem'
+            }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent-red)', marginBottom: '0.5rem' }}>Юридическое требование</div>
+              <div style={{ fontSize: '0.85rem' }}>{insurance_comparison.legal_requirement}</div>
+            </div>
+            <div style={{
+              padding: '1rem',
+              background: 'rgba(0, 255, 136, 0.05)',
+              border: '1px solid rgba(0, 255, 136, 0.3)',
+              borderRadius: '0.5rem'
+            }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent-green)', marginBottom: '0.5rem' }}>Рекомендация</div>
+              <div style={{ fontSize: '0.85rem' }}>{insurance_comparison.recommended}</div>
+            </div>
+          </div>
+
+          {/* Coverage */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{
+              padding: '1rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.5rem'
+            }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '0.75rem' }}>✓ Покрывается</div>
+              {insurance_comparison.coverage.covered.map((item, i) => (
+                <div key={i} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>• {item}</div>
+              ))}
+            </div>
+            <div style={{
+              padding: '1rem',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.5rem'
+            }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--accent-red)', marginBottom: '0.75rem' }}>✗ НЕ покрывается</div>
+              {insurance_comparison.coverage.not_covered.map((item, i) => (
+                <div key={i} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>• {item}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* By Provider Type */}
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.75rem' }}>Страхование по типу провайдера</div>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {insurance_comparison.by_type.map((item, i) => (
+                <div key={i} style={{
+                  padding: '0.75rem',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderRadius: '0.5rem',
+                  display: 'grid',
+                  gridTemplateColumns: '150px 1fr',
+                  gap: '1rem',
+                  alignItems: 'center',
+                  fontSize: '0.8rem'
+                }}>
+                  <div style={{ fontWeight: '600' }}>{item.type}</div>
+                  <div>
+                    <span style={{ color: 'var(--text-secondary)' }}>{item.insurance}</span>
+                    <span style={{ color: 'var(--accent-green)', marginLeft: '0.5rem' }}>+ {item.pros}</span>
+                    <span style={{ color: 'var(--accent-red)', marginLeft: '0.5rem' }}>− {item.cons}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Zero Multas Warning */}
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: 'rgba(245, 158, 11, 0.1)',
+            borderLeft: '3px solid var(--accent-yellow)',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem'
+          }}>
+            ⚠️ {insurance_comparison.zero_multas}
+          </div>
+        </div>
+      )}
+
+      {/* International Trade Comparison */}
+      {intl_trade_comparison && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>{intl_trade_comparison.title}</h3>
+
+          {/* OEA Certification */}
+          <div style={{
+            padding: '1.25rem',
+            background: 'rgba(0, 255, 136, 0.05)',
+            border: '1px solid rgba(0, 255, 136, 0.3)',
+            borderRadius: '0.75rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ fontWeight: '700', marginBottom: '0.5rem', color: 'var(--accent-green)' }}>
+              🏆 {intl_trade_comparison.oea_certified.title}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+              {intl_trade_comparison.oea_certified.description}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent-green)', marginBottom: '0.5rem' }}>Сертифицированы</div>
+                {intl_trade_comparison.oea_certified.certified.map((name, i) => (
+                  <div key={i} style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>✓ {name}</div>
+                ))}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--accent-red)', marginBottom: '0.5rem' }}>Не сертифицированы</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{intl_trade_comparison.oea_certified.not_certified}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* ВЭД Specialists */}
+          <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '1rem' }}>ВЭД Специалисты</div>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            {intl_trade_comparison.specialists.map((spec, i) => (
+              <div key={i} style={{
+                padding: '1.25rem',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.75rem',
+                borderLeft: `4px solid ${i === 0 ? 'var(--accent-cyan)' : i === 1 ? 'var(--accent-green)' : 'var(--accent-purple)'}`
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div>
+                    <div style={{ fontWeight: '700', fontSize: '1rem' }}>{spec.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>{spec.focus}</div>
+                  </div>
+                  <div style={{
+                    padding: '0.35rem 0.75rem',
+                    background: 'var(--accent-green)',
+                    color: '#000',
+                    borderRadius: '0.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.8rem'
+                  }}>
+                    {spec.pricing}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  {spec.services.map((service, j) => (
+                    <span key={j} style={{
+                      padding: '0.25rem 0.5rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '0.25rem',
+                      fontSize: '0.75rem',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      {service}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Глубина экспертизы: <span style={{ color: 'var(--accent-purple)', fontWeight: '600' }}>{spec.trade_depth}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Summary */}
+      <div style={{
+        padding: '1.5rem',
+        background: 'rgba(112, 0, 255, 0.05)',
+        borderLeft: '3px solid var(--accent-purple)',
+        borderRadius: '8px'
+      }}>
+        <p style={{ margin: 0, lineHeight: '1.6' }} dangerouslySetInnerHTML={{ __html: summary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
       </div>
     </div>
   );
@@ -398,10 +942,278 @@ const DetailedTimeline = ({ phases }) => (
   </div>
 );
 
+// Market Entry Strategy Component
+const MarketEntryStrategy = ({ chapter }) => {
+  const { positioning, pricing_tiers, differentiators, go_to_market, financials, tech_stack, moats, conclusion } = chapter;
+
+  return (
+    <div>
+      {/* Key Metrics */}
+      <div className="metrics-grid" style={{ marginBottom: '2rem' }}>
+        <MetricCard label="Target Market" value="€2-8M" subtext="S.L. Revenue" />
+        <MetricCard label="Pricing Range" value="€400-950" subtext="Per Month" />
+        <MetricCard label="Year 3 ARR" value="€1.8M" subtext="250 Clients" />
+      </div>
+
+      {/* Target Persona */}
+      <h3 style={{ marginBottom: '1rem' }}>Целевой Клиент</h3>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '0.75rem',
+        marginBottom: '2rem'
+      }}>
+        {Object.entries(positioning.target_persona).map(([key, value], i) => (
+          <div key={i} style={{
+            padding: '0.75rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.5rem',
+            fontSize: '0.85rem'
+          }}>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+              {key.replace(/_/g, ' ')}
+            </div>
+            <div style={{ color: 'var(--text-primary)' }}>{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Pricing Tiers */}
+      <h3 style={{ marginBottom: '1rem' }}>Ценовые Tier'ы</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+        {pricing_tiers.map((tier, i) => (
+          <div key={i} style={{
+            padding: '1.5rem',
+            background: i === 1 ? 'rgba(0, 242, 255, 0.05)' : 'var(--bg-card)',
+            border: i === 1 ? '2px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+            borderRadius: '0.75rem'
+          }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{tier.target}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>{tier.name}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'var(--accent-green)', marginBottom: '1rem' }}>
+              {tier.price}
+            </div>
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+              {tier.includes.map((item, j) => (
+                <div key={j} style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.5rem',
+                  paddingLeft: '1rem',
+                  position: 'relative'
+                }}>
+                  <span style={{ position: 'absolute', left: 0, color: 'var(--accent-green)' }}>✓</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Differentiators */}
+      <h3 style={{ marginBottom: '1rem' }}>Ключевые Дифференциаторы</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2.5rem' }}>
+        {differentiators.map((diff, i) => (
+          <div key={i} style={{
+            padding: '1rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.5rem',
+            borderTop: '3px solid var(--accent-purple)'
+          }}>
+            <div style={{ fontWeight: '600', marginBottom: '0.5rem', fontSize: '0.9rem' }}>{diff.title}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{diff.description}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Go-to-Market */}
+      <h3 style={{ marginBottom: '1rem' }}>Go-to-Market Strategy</h3>
+      <div style={{ marginBottom: '2.5rem' }}>
+        {go_to_market.map((phase, i) => (
+          <div key={i} style={{
+            padding: '1.25rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.75rem',
+            marginBottom: '1rem',
+            borderLeft: `4px solid ${i === 0 ? 'var(--accent-cyan)' : i === 1 ? 'var(--accent-purple)' : 'var(--accent-green)'}`
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div style={{ fontWeight: '700' }}>{phase.phase}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{phase.duration}</div>
+            </div>
+            <div style={{
+              padding: '0.5rem 0.75rem',
+              background: 'rgba(0, 255, 136, 0.1)',
+              borderRadius: '0.25rem',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+              fontWeight: '600',
+              color: 'var(--accent-green)'
+            }}>
+              🎯 {phase.goal}
+            </div>
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
+              {phase.actions.map((action, j) => (
+                <div key={j} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                  • {action}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Financial Projections */}
+      <h3 style={{ marginBottom: '1rem' }}>{financials.title}</h3>
+      <div style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
+        <table className="competitor-table" style={{ minWidth: '600px' }}>
+          <thead>
+            <tr>
+              <th>Год</th>
+              <th>Клиенты</th>
+              <th>MRR</th>
+              <th>ARR</th>
+              <th>Команда</th>
+              <th>Margin</th>
+              <th>EBITDA</th>
+            </tr>
+          </thead>
+          <tbody>
+            {financials.years.map((year, i) => (
+              <tr key={i}>
+                <td style={{ fontWeight: '600' }}>{year.year}</td>
+                <td>{year.clients}</td>
+                <td style={{ fontFamily: 'monospace' }}>{year.mrr}</td>
+                <td style={{ fontFamily: 'monospace', color: 'var(--accent-green)' }}>{year.arr}</td>
+                <td>{year.team}</td>
+                <td>{year.margin}</td>
+                <td style={{ color: year.ebitda.includes('-') ? 'var(--accent-red)' : 'var(--accent-green)' }}>{year.ebitda}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{
+          padding: '1rem',
+          background: 'rgba(0, 242, 255, 0.05)',
+          borderRadius: '0.5rem',
+          marginBottom: '1rem'
+        }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Capital Required</div>
+          <div style={{ fontWeight: '700', color: 'var(--accent-cyan)' }}>{financials.capital_required}</div>
+        </div>
+        <div style={{ display: 'grid', gap: '0.75rem' }}>
+          {financials.funding_options.map((option, i) => (
+            <div key={i} style={{ fontSize: '0.85rem', display: 'flex', gap: '0.5rem' }}>
+              <span style={{ fontWeight: '600', minWidth: '100px' }}>{option.type}:</span>
+              <span style={{ color: option.type === 'Angel' ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
+                {option.description}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tech Stack */}
+      <h3 style={{ marginBottom: '1rem' }}>{tech_stack.title}</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        {tech_stack.core.map((item, i) => (
+          <div key={i} style={{
+            padding: '0.75rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.5rem'
+          }}>
+            <div style={{ fontWeight: '600', fontSize: '0.85rem', marginBottom: '0.25rem' }}>{item.name}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.75rem' }}>Build vs Buy</div>
+        <div style={{ display: 'grid', gap: '0.5rem' }}>
+          {tech_stack.build_vs_buy.map((item, i) => (
+            <div key={i} style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0.5rem',
+              background: item.decision === 'BUILD' ? 'rgba(112, 0, 255, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+              borderRadius: '0.25rem',
+              fontSize: '0.8rem'
+            }}>
+              <span>{item.item}</span>
+              <span style={{
+                padding: '0.2rem 0.5rem',
+                background: item.decision === 'BUILD' ? 'var(--accent-purple)' : 'var(--accent-cyan)',
+                color: '#000',
+                borderRadius: '0.25rem',
+                fontWeight: '600',
+                fontSize: '0.7rem'
+              }}>
+                {item.decision}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+          💰 {tech_stack.investment}
+        </div>
+      </div>
+
+      {/* Competitive Moats */}
+      <h3 style={{ marginBottom: '1rem' }}>{moats.title}</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        {[
+          { title: 'Short-term (12-24 мес)', items: moats.short_term, color: 'var(--accent-cyan)' },
+          { title: 'Medium-term (24-48 мес)', items: moats.medium_term, color: 'var(--accent-purple)' },
+          { title: 'Long-term (48+ мес)', items: moats.long_term, color: 'var(--accent-green)' }
+        ].map((moat, i) => (
+          <div key={i} style={{
+            padding: '1rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.5rem',
+            borderTop: `3px solid ${moat.color}`
+          }}>
+            <div style={{ fontWeight: '600', fontSize: '0.85rem', marginBottom: '0.75rem' }}>{moat.title}</div>
+            {moat.items.map((item, j) => (
+              <div key={j} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', lineHeight: '1.4' }}>
+                • {item}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Conclusion */}
+      <div style={{
+        padding: '1.5rem',
+        background: 'rgba(112, 0, 255, 0.05)',
+        borderLeft: '3px solid var(--accent-purple)',
+        borderRadius: '8px'
+      }}>
+        <p style={{ margin: 0, lineHeight: '1.6' }} dangerouslySetInnerHTML={{ __html: conclusion.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+      </div>
+    </div>
+  );
+};
+
 // --- Main Content Renderer ---
 
 const ChapterContent = ({ chapter }) => {
   // Custom renders for specific chapters based on ID
+  if (chapter.id === 'market-entry') {
+    return <MarketEntryStrategy chapter={chapter} />;
+  }
+
   if (chapter.id === 'market-deep') {
     return (
       <div>
@@ -520,7 +1332,18 @@ const ChapterContent = ({ chapter }) => {
   }
 
   if (chapter.id === 'competitors') {
-    return <CompetitorTable matrix={chapter.matrix} summary={chapter.summary} />;
+    return (
+      <CompetitorTable
+        segments={chapter.segments}
+        matrix={chapter.matrix}
+        insights={chapter.insights}
+        gaps={chapter.gaps}
+        summary={chapter.summary}
+        sla_comparison={chapter.sla_comparison}
+        insurance_comparison={chapter.insurance_comparison}
+        intl_trade_comparison={chapter.intl_trade_comparison}
+      />
+    );
   }
 
   if (chapter.id === 'tech-stack-deep') {
