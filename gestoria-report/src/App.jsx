@@ -389,6 +389,52 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
                   </div>
                 </div>
 
+                {/* SLA & Insurance Row */}
+                {(comp.sla || comp.insurance) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
+                    {comp.sla && (
+                      <div style={{
+                        padding: '0.5rem',
+                        background: 'rgba(0, 242, 255, 0.05)',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem'
+                      }}>
+                        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>SLA</div>
+                        <div style={{ fontWeight: '600', color: comp.sla === '1ч' || comp.sla === '<24ч' || comp.sla === '24ч' ? 'var(--accent-green)' : 'var(--text-primary)' }}>
+                          {comp.sla}
+                        </div>
+                        {comp.sla_type && <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{comp.sla_type}</div>}
+                      </div>
+                    )}
+                    {comp.guarantee && (
+                      <div style={{
+                        padding: '0.5rem',
+                        background: 'rgba(112, 0, 255, 0.05)',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem'
+                      }}>
+                        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Гарантия</div>
+                        <div style={{ fontWeight: '600', color: comp.guarantee.includes('Zero Multas') || comp.guarantee.includes('Превентивный') ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
+                          {comp.guarantee}
+                        </div>
+                      </div>
+                    )}
+                    {comp.insurance && (
+                      <div style={{
+                        padding: '0.5rem',
+                        background: 'rgba(0, 255, 136, 0.05)',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem'
+                      }}>
+                        <div style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Страховка</div>
+                        <div style={{ fontWeight: '600', color: comp.insurance.includes('€') ? 'var(--accent-green)' : 'var(--text-primary)' }}>
+                          {comp.insurance}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Positioning */}
                 {comp.positioning && (
                   <div style={{
