@@ -110,7 +110,7 @@ export const content = {
           { item: "Итого стоимость", inhouse: "€53-67k/год", outsource: "€42k/год" },
           { item: "Заболел/отпуск", inhouse: "Проблема", outsource: "Команда backup" },
           { item: "ВЭД экспертиза", inhouse: "Отдельный найм", outsource: "Включено" },
-          { item: "Ошибка → штраф", inhouse: "Платит компания", outsource: "Платит гесторія" },
+          { item: "Ошибка → штраф", inhouse: "Платит компания", outsource: "Платит Gestoría" },
           { item: "Софт (ERP, tools)", inhouse: "€3-5k/год доп.", outsource: "Включено" },
           { item: "HR головная боль", inhouse: "100%", outsource: "0%" }
         ],
@@ -1645,7 +1645,7 @@ export const content = {
           { category: "Стоимость", hiring: "€53-67k/год (€4.4-5.5k/мес)", ultra: "€42k/год (€3.5k/мес)", winner: "ultra" },
           { category: "Отпуск/больничный", hiring: "Работа стоит", ultra: "Команда backup", winner: "ultra" },
           { category: "ВЭД экспертиза", hiring: "+€30-40k второй найм", ultra: "Включено в команду", winner: "ultra" },
-          { category: "Ошибка → штраф", hiring: "Платит компания", ultra: "Платит гесторія (гарантия)", winner: "ultra" },
+          { category: "Ошибка → штраф", hiring: "Платит компания", ultra: "Платит Gestoría (гарантия)", winner: "ultra" },
           { category: "SLA/скорость", hiring: "Когда успеет", ultra: "<1ч критичные, 24/7", winner: "ultra" },
           { category: "Софт (ERP)", hiring: "€3-5k/год отдельно", ultra: "Holded/A3 включено", winner: "ultra" },
           { category: "HR/менеджмент", hiring: "Ваша забота", ultra: "Не ваша проблема", winner: "ultra" },

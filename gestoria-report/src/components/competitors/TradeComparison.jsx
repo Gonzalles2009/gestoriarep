@@ -148,7 +148,47 @@ const TradeComparison = ({ intl_trade_comparison }) => {
       {intl_trade_comparison.specialists && (
         <div style={{ marginBottom: '1rem' }}>
           <div style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.75rem' }}>Обзор ВЭД-специалистов</div>
-          <div className="data-table-container" style={{ overflowX: 'auto' }}>
+
+          {/* Mobile: Card View */}
+          <div className="trade-cards-mobile" style={{ display: 'grid', gap: '1rem' }}>
+            {intl_trade_comparison.specialists.map((spec, i) => (
+              <div key={i} style={{
+                padding: '1rem',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.75rem',
+                borderLeft: '4px solid var(--accent-cyan)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div style={{ fontWeight: '700', fontSize: '1rem' }}>{spec.name}</div>
+                  <span style={{
+                    padding: '0.2rem 0.5rem',
+                    background: 'rgba(0, 242, 255, 0.2)',
+                    color: 'var(--accent-cyan)',
+                    borderRadius: '0.25rem',
+                    fontSize: '0.7rem',
+                    fontWeight: '600'
+                  }}>
+                    {spec.focus}
+                  </span>
+                </div>
+                <div style={{ fontFamily: 'monospace', fontSize: '1.1rem', fontWeight: '600', color: 'var(--accent-green)', marginBottom: '0.75rem' }}>
+                  {spec.pricing}
+                </div>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Услуги</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{spec.services.join(' • ')}</div>
+                </div>
+                <div style={{ fontSize: '0.8rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Глубина: </span>
+                  <span>{spec.trade_depth}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: Table View */}
+          <div className="trade-table-desktop" style={{ overflowX: 'auto' }}>
             <table className="data-table" style={{ minWidth: '700px' }}>
               <thead>
                 <tr>
