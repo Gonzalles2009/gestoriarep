@@ -678,3 +678,104 @@ a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 70px 0.75rem 1.5rem 0.75rem;
+  }
+
+  .chapter-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .chapter-heading {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .metric-card {
+    padding: 1rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+  }
+
+  .metric-trend,
+  .metric-subtext {
+    font-size: 0.7rem;
+  }
+
+  .bar-row {
+    grid-template-columns: 80px 1fr 50px;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
+  }
+
+  .bar-label {
+    font-size: 0.7rem;
+  }
+
+  .bar-value {
+    font-size: 0.75rem;
+  }
+
+  .data-table {
+    min-width: 600px;
+    font-size: 0.8rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .section-block {
+    padding: 1rem;
+  }
+
+  .timeline-container,
+  .roadmap-container {
+    padding-left: 1rem;
+  }
+
+  .phase-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .pricing-card {
+    padding: 1rem;
+  }
+
+  .pricing-price {
+    font-size: 1.25rem;
+  }
+
+  .competitor-segments {
+    flex-direction: column;
+  }
+
+  .segment-card {
+    width: 100%;
+  }
+}
+
+/* Smooth horizontal scroll for tables */
+.data-table-container {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}

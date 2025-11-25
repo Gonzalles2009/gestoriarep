@@ -1,0 +1,1 @@
+export { segmentColors } from './segmentColors';
