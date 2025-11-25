@@ -40,7 +40,7 @@ const MarketSegmentCard = ({ segment }) => (
       ))}
     </div>
     <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
-      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Цена для S.L. 1-5M€:</div>
+      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Цена для S.L. €3-20M:</div>
       <div style={{ fontSize: '0.85rem', fontWeight: '600', color: segment.color }}>{segment.priceRange}</div>
     </div>
   </div>
@@ -49,19 +49,19 @@ const MarketSegmentCard = ({ segment }) => (
 const GapAnalysis = ({ gaps }) => (
   <div style={{
     padding: '1.5rem',
-    background: 'rgba(255, 0, 102, 0.05)',
-    border: '1px solid rgba(255, 0, 102, 0.2)',
+    background: 'rgba(0, 255, 136, 0.05)',
+    border: '1px solid rgba(0, 255, 136, 0.2)',
     borderRadius: '0.75rem',
     marginTop: '2rem'
   }}>
-    <h3 style={{ margin: '0 0 1rem 0', color: 'var(--accent-red)' }}>Gap-Анализ: Почему рынок не закрыт</h3>
+    <h3 style={{ margin: '0 0 1rem 0', color: 'var(--accent-green)' }}>Gap-Анализ: Рыночные Возможности</h3>
     <div style={{ display: 'grid', gap: '1rem' }}>
       {gaps.map((gap, i) => (
         <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
           <div style={{
             minWidth: '2rem',
             height: '2rem',
-            background: 'var(--accent-red)',
+            background: 'var(--accent-green)',
             color: '#000',
             borderRadius: '50%',
             display: 'flex',
@@ -91,7 +91,7 @@ const HiringComparison = ({ data }) => (
           <tr>
             <th>Параметр</th>
             <th style={{ textAlign: 'center' }}>Свой бухгалтер</th>
-            <th style={{ textAlign: 'center', background: 'rgba(112, 0, 255, 0.1)' }}>Gestoría Premium</th>
+            <th style={{ textAlign: 'center', background: 'rgba(112, 0, 255, 0.1)' }}>Gestoría Ultra</th>
           </tr>
         </thead>
         <tbody>
