@@ -23,7 +23,7 @@ const CompetitorTable = ({ segments, matrix, insights, gaps, summary, sla_compar
       {/* Key Metrics */}
       <div className="metrics-grid" style={{ marginBottom: '2rem' }}>
         <MetricCard label="Конкурентов в базе" value={matrix.length} subtext="Все сегменты" />
-        <MetricCard label="Market Gap" value="S.L. €1-10M" subtext="Пропущенная середина" />
+        <MetricCard label="Market Gap" value="S.L. €3-20M" subtext="Outsourced Finance Team" />
         <MetricCard label="Рыночных возможностей" value={gaps.length} subtext="Для входа" />
       </div>
 

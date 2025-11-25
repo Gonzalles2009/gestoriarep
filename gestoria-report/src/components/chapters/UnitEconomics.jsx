@@ -291,8 +291,61 @@ const FundingOptions = ({ options }) => (
   </div>
 );
 
+const ClientMix = ({ data }) => (
+  <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+    <h3 style={{ marginBottom: '1rem' }}>{data.title}</h3>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+      {data.tiers.map((tier, i) => (
+        <div key={i} style={{
+          padding: '1.25rem',
+          background: 'var(--bg-card)',
+          border: `2px solid ${tier.color}`,
+          borderRadius: '0.75rem',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: '700', color: tier.color, marginBottom: '0.25rem' }}>
+            {tier.tier}
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+            {tier.price}
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+            {tier.count}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+            клиентов
+          </div>
+          <div style={{ fontSize: '1rem', fontWeight: '600', color: tier.color }}>
+            {tier.arr}
+          </div>
+        </div>
+      ))}
+    </div>
+    <div style={{
+      padding: '1rem',
+      background: 'linear-gradient(135deg, rgba(112, 0, 255, 0.1), rgba(0, 255, 136, 0.1))',
+      border: '2px solid var(--accent-green)',
+      borderRadius: '0.5rem',
+      display: 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '1rem'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ВСЕГО КЛИЕНТОВ</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>{data.total.clients}</div>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ИТОГО ARR</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--accent-green)' }}>{data.total.arr}</div>
+      </div>
+    </div>
+  </div>
+);
+
 const UnitEconomics = ({ chapter }) => {
-  const { metrics, projections, risks, roadmap, funding, salaries, teamCost } = chapter;
+  const { metrics, client_mix, projections, risks, roadmap, funding, salaries, teamCost } = chapter;
 
   return (
     <div>
@@ -302,6 +355,9 @@ const UnitEconomics = ({ chapter }) => {
           <MetricCard key={i} label={m.label} value={m.value} subtext={m.subtext} />
         ))}
       </div>
+
+      {/* Client Mix for €1M ARR */}
+      {client_mix && <ClientMix data={client_mix} />}
 
       {/* Pricing Table */}
       <h3 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Коммерческие Пакеты</h3>

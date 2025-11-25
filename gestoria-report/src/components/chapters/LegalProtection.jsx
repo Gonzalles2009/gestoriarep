@@ -67,7 +67,7 @@ const InsuranceProviders = ({ data }) => (
     {/* Recommended Coverage */}
     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(0, 242, 255, 0.05)', borderRadius: '0.5rem' }}>
       <div style={{ fontSize: '1.75rem', fontWeight: '700', color: 'var(--accent-cyan)' }}>{data.recommended_coverage}</div>
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Рекомендуемый лимит для S.L. €1-10M</div>
+      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Рекомендуемый лимит для S.L. €3-20M</div>
     </div>
 
     {/* Coverage Grid */}

@@ -82,6 +82,52 @@ const GapAnalysis = ({ gaps }) => (
   </div>
 );
 
+const HiringComparison = ({ data }) => (
+  <div style={{ marginTop: '2rem' }}>
+    <h3 style={{ marginBottom: '1rem' }}>{data.title}</h3>
+    <div style={{ overflowX: 'auto' }}>
+      <table className="data-table" style={{ minWidth: '500px' }}>
+        <thead>
+          <tr>
+            <th>Параметр</th>
+            <th style={{ textAlign: 'center' }}>Свой бухгалтер</th>
+            <th style={{ textAlign: 'center', background: 'rgba(112, 0, 255, 0.1)' }}>Gestoría Premium</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.comparison.map((row, i) => (
+            <tr key={i}>
+              <td style={{ fontWeight: '600' }}>{row.item}</td>
+              <td style={{ textAlign: 'center' }}>{row.inhouse}</td>
+              <td style={{
+                textAlign: 'center',
+                background: 'rgba(112, 0, 255, 0.05)',
+                color: row.outsource !== '—' ? 'var(--accent-green)' : 'var(--text-secondary)',
+                fontWeight: row.outsource !== '—' ? '600' : '400'
+              }}>
+                {row.outsource}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div style={{
+      marginTop: '1rem',
+      padding: '1rem',
+      background: 'linear-gradient(135deg, rgba(112, 0, 255, 0.1), rgba(0, 255, 136, 0.1))',
+      border: '2px solid var(--accent-green)',
+      borderRadius: '0.5rem',
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      color: 'var(--accent-green)',
+      textAlign: 'center'
+    }}>
+      {data.verdict}
+    </div>
+  </div>
+);
+
 const ClientPersona = ({ personas }) => (
   <div style={{ marginTop: '2rem' }}>
     <h3 style={{ marginBottom: '1rem' }}>Психотипы Целевых Клиентов</h3>
@@ -119,7 +165,7 @@ const ClientPersona = ({ personas }) => (
 );
 
 const MarketArchitecture = ({ chapter }) => {
-  const { metrics, segments, revenues, gaps, personas } = chapter;
+  const { metrics, segments, revenues, gaps, personas, hiring_comparison } = chapter;
 
   return (
     <div>
@@ -147,6 +193,9 @@ const MarketArchitecture = ({ chapter }) => {
 
       {/* Client Personas */}
       <ClientPersona personas={personas} />
+
+      {/* Hiring Comparison */}
+      {hiring_comparison && <HiringComparison data={hiring_comparison} />}
     </div>
   );
 };

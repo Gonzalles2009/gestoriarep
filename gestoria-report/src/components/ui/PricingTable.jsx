@@ -11,25 +11,28 @@ const PricingTable = () => (
       </thead>
       <tbody>
         <tr>
-          <td><span className="tag standard">Business Standard</span></td>
-          <td>S.L. &lt;2M€, Локальные</td>
+          <td><span className="tag standard">Standard</span></td>
+          <td>S.L. €1-3M, базовая ВЭД</td>
           <td>&lt; 24ч</td>
-          <td>€450 - €700</td>
+          <td style={{ fontWeight: '600' }}>€800</td>
         </tr>
-        <tr>
-          <td><span className="tag premium">Global Premium</span></td>
-          <td>S.L. 2-5M€, Импорт/Экспорт</td>
-          <td>&lt; 4ч (Приоритет)</td>
-          <td>€750 - €1200</td>
+        <tr style={{ background: 'rgba(0, 242, 255, 0.05)' }}>
+          <td><span className="tag premium">Premium</span></td>
+          <td>S.L. €3-8M, активная ВЭД</td>
+          <td>&lt; 4ч критичные</td>
+          <td style={{ fontWeight: '600', color: 'var(--accent-cyan)' }}>€2,000</td>
         </tr>
-        <tr>
-          <td><span className="tag elite">Corporate Elite</span></td>
-          <td>S.L. &gt;5M€, Холдинги</td>
-          <td>24/7 Личный менеджер</td>
-          <td>&gt; €1500</td>
+        <tr style={{ background: 'rgba(112, 0, 255, 0.05)' }}>
+          <td><span className="tag elite">Ultra</span></td>
+          <td>S.L. €8-20M+, заменяет найм</td>
+          <td>&lt; 1ч, 24/7</td>
+          <td style={{ fontWeight: '600', color: 'var(--accent-purple)' }}>€3,500</td>
         </tr>
       </tbody>
     </table>
+    <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+      Ultra €3,500/мес = дешевле найма бухгалтера (€4.5-5.5k с налогами) + команда + гарантия
+    </div>
   </div>
 );
 

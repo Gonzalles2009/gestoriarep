@@ -30,39 +30,95 @@ const PricingTiers = ({ tiers }) => (
   <div style={{ marginBottom: '2.5rem' }}>
     <h3 style={{ marginBottom: '1rem' }}>Ценовые Пакеты</h3>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
-      {tiers.map((tier, i) => (
-        <div key={i} style={{
-          padding: '1.5rem',
-          background: i === 1 ? 'rgba(0, 242, 255, 0.05)' : 'var(--bg-card)',
-          border: i === 1 ? '2px solid var(--accent-cyan)' : '1px solid var(--border-color)',
-          borderRadius: '0.75rem'
-        }}>
-          {i === 1 && (
-            <div style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              ПОПУЛЯРНЫЙ
-            </div>
-          )}
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{tier.target}</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>{tier.name}</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: '700', color: 'var(--accent-green)', marginBottom: '1rem' }}>
-            {tier.price}
-          </div>
-          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-            {tier.includes.map((item, j) => (
-              <div key={j} style={{
-                fontSize: '0.8rem',
-                color: 'var(--text-secondary)',
-                marginBottom: '0.5rem',
-                paddingLeft: '1rem',
-                position: 'relative'
-              }}>
-                <span style={{ position: 'absolute', left: 0, color: 'var(--accent-green)' }}>✓</span>
-                {item}
+      {tiers.map((tier, i) => {
+        const isUltra = tier.name === 'Ultra';
+        const isPremium = tier.popular;
+        return (
+          <div key={i} style={{
+            padding: '1.5rem',
+            background: isUltra ? 'rgba(112, 0, 255, 0.08)' : isPremium ? 'rgba(0, 242, 255, 0.05)' : 'var(--bg-card)',
+            border: isUltra ? '2px solid var(--accent-purple)' : isPremium ? '2px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+            borderRadius: '0.75rem'
+          }}>
+            {isUltra && (
+              <div style={{ fontSize: '0.7rem', color: 'var(--accent-purple)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                ЗАМЕНЯЕТ НАЙМ БУХГАЛТЕРА
               </div>
-            ))}
+            )}
+            {isPremium && !isUltra && (
+              <div style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                ПОПУЛЯРНЫЙ
+              </div>
+            )}
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{tier.target}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>{tier.name}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '700', color: isUltra ? 'var(--accent-purple)' : 'var(--accent-green)', marginBottom: '1rem' }}>
+              {tier.price}
+            </div>
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+              {tier.includes.map((item, j) => (
+                <div key={j} style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.5rem',
+                  paddingLeft: '1rem',
+                  position: 'relative'
+                }}>
+                  <span style={{ position: 'absolute', left: 0, color: isUltra ? 'var(--accent-purple)' : 'var(--accent-green)' }}>✓</span>
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
+    </div>
+  </div>
+);
+
+const VsHiring = ({ data }) => (
+  <div style={{ marginBottom: '2.5rem' }}>
+    <h3 style={{ marginBottom: '1rem' }}>{data.title}</h3>
+    <div style={{ overflowX: 'auto' }}>
+      <table className="data-table" style={{ minWidth: '600px' }}>
+        <thead>
+          <tr>
+            <th>Параметр</th>
+            <th style={{ textAlign: 'center' }}>Свой бухгалтер</th>
+            <th style={{ textAlign: 'center', background: 'rgba(112, 0, 255, 0.1)' }}>Ultra €3,500/мес</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.rows.map((row, i) => (
+            <tr key={i}>
+              <td style={{ fontWeight: '600' }}>{row.category}</td>
+              <td style={{ textAlign: 'center', color: row.winner === 'ultra' ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
+                {row.hiring}
+              </td>
+              <td style={{
+                textAlign: 'center',
+                background: 'rgba(112, 0, 255, 0.05)',
+                color: row.winner === 'ultra' ? 'var(--accent-green)' : 'var(--text-primary)',
+                fontWeight: row.winner === 'ultra' ? '600' : '400'
+              }}>
+                {row.ultra} {row.winner === 'ultra' && '✓'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div style={{
+      marginTop: '1rem',
+      padding: '1rem',
+      background: 'rgba(0, 255, 136, 0.1)',
+      border: '1px solid var(--accent-green)',
+      borderRadius: '0.5rem',
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      color: 'var(--accent-green)'
+    }}>
+      {data.conclusion}
     </div>
   </div>
 );
@@ -235,23 +291,45 @@ const CompetitiveMoats = ({ moats }) => (
 );
 
 const StrategyLaunch = ({ chapter }) => {
-  const { positioning, pricing_tiers, differentiators, execution_roadmap, tech_stack, moats, conclusion } = chapter;
+  const { positioning, pricing_tiers, vs_hiring, differentiators, execution_roadmap, tech_stack, moats, conclusion } = chapter;
 
   return (
     <div>
       {/* Key Metrics */}
       <div className="metrics-grid" style={{ marginBottom: '2rem' }}>
-        <MetricCard label="Target Market" value="€2-8M" subtext="S.L. оборот" />
-        <MetricCard label="Pricing" value="€400-950" subtext="в месяц" />
-        <MetricCard label="Цель 2026" value="50" subtext="клиентов" />
-        <MetricCard label="Break-even" value="Q2 2027" subtext="прогноз" />
+        <MetricCard label="Target Market" value="€3-20M" subtext="S.L. оборот" />
+        <MetricCard label="ARPU" value="€20k" subtext="в год / клиент" />
+        <MetricCard label="Цель 2027" value="€1M" subtext="ARR" />
+        <MetricCard label="Клиентов" value="45" subtext="для €1M ARR" />
       </div>
+
+      {/* Value Proposition */}
+      {positioning.value_prop && (
+        <div style={{
+          marginBottom: '2rem',
+          padding: '1.25rem',
+          background: 'linear-gradient(135deg, rgba(112, 0, 255, 0.1), rgba(0, 242, 255, 0.1))',
+          border: '2px solid var(--accent-purple)',
+          borderRadius: '0.75rem',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', marginBottom: '0.5rem', fontWeight: '600' }}>
+            КЛЮЧЕВОЙ ИНСАЙТ
+          </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: '700', lineHeight: '1.5' }}>
+            {positioning.value_prop}
+          </div>
+        </div>
+      )}
 
       {/* Target Persona */}
       <TargetPersona persona={positioning.target_persona} />
 
       {/* Pricing Tiers */}
       <PricingTiers tiers={pricing_tiers} />
+
+      {/* Vs Hiring Comparison */}
+      {vs_hiring && <VsHiring data={vs_hiring} />}
 
       {/* Differentiators */}
       <Differentiators items={differentiators} />
